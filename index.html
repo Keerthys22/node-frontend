@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>FlowNotes | elegant workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(145deg, #1a1e2c 0%, #2a2f3f 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: #eef2ff;
+      scroll-behavior: smooth;
+    }
+
+    /* custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2d3348;
+      border-radius: 12px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #6c5ce7;
+      border-radius: 12px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8b74ff;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      backdrop-filter: blur(2px);
+    }
+
+    /* header area with glassmorphism */
+    .app-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .app-header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E9D8FD, #B794F4);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: inline-block;
+    }
+    .sub {
+      color: #a5b4fc;
+      font-weight: 400;
+      margin-top: 8px;
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
+
+    /* ----- form card (pastel/dark hybrid) ----- */
+    .form-card {
+      background: rgba(30, 34, 52, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.8rem 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.2s ease;
+    }
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .form input, .form textarea {
+      background: #1e2132;
+      border: 1.5px solid #323a54;
+      border-radius: 1.5rem;
+      padding: 1rem 1.3rem;
+      font-size: 1rem;
+      font-family: 'Inter', monospace;
+      color: #f0f3ff;
+      transition: all 0.25s ease;
+      outline: none;
+      resize: vertical;
+    }
+    .form input:focus, .form textarea:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+      background: #262b40;
+    }
+    .form input::placeholder, .form textarea::placeholder {
+      color: #6a6f8d;
+      font-weight: 400;
+    }
+    .form textarea {
+      min-height: 110px;
+    }
+    .btn-primary {
+      background: linear-gradient(95deg, #7c3aed, #a78bfa);
+      border: none;
+      border-radius: 2rem;
+      padding: 0.9rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      box-shadow: 0 6px 14px rgba(124, 58, 237, 0.3);
+    }
+    .btn-primary:hover {
+      transform: scale(0.98);
+      background: linear-gradient(95deg, #6d28d9, #8b5cf6);
+      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.4);
+    }
+    .btn-secondary {
+      background: rgba(45, 50, 72, 0.9);
+      border: 1px solid #4a4f6e;
+      border-radius: 2rem;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      font-size: 0.8rem;
+      color: #e2e8ff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #3b415e;
+      border-color: #8b5cf6;
+      color: white;
+    }
+
+    /* notes grid - modern masonry feel */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.6rem;
+      margin-top: 0.5rem;
+    }
+
+    /* note card with sliding/scale entrance animation */
+    .note-card {
+      background: rgba(25, 28, 45, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 1.8rem;
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.5, 1.1);
+      border: 1px solid rgba(147, 129, 255, 0.2);
+      box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.4);
+      animation: slideFadeUp 0.4s ease forwards;
+      display: flex;
+      flex-direction: column;
+    }
+    .note-card:hover {
+      transform: translateY(-5px);
+      background: rgba(34, 38, 60, 0.95);
+      border-color: rgba(139, 92, 246, 0.5);
+      box-shadow: 0 25px 35px -16px black;
+    }
+
+    @keyframes slideFadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(28px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .note-title {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      background: linear-gradient(120deg, #ffffff, #c7d2fe);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      word-break: break-word;
+    }
+    .note-content-preview {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: #cdd6f4;
+      margin-bottom: 1.5rem;
+      word-break: break-word;
+      white-space: pre-wrap;
+      flex: 1;
+      max-height: 140px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .note-actions {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: flex-end;
+      margin-top: 0.75rem;
+      border-top: 1px dashed rgba(139, 92, 246, 0.3);
+      padding-top: 1rem;
+    }
+    .icon-btn {
+      background: rgba(60, 65, 90, 0.7);
+      border: none;
+      border-radius: 2rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #e2e8ff;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .icon-btn.edit-btn {
+      background: rgba(99, 102, 241, 0.2);
+    }
+    .icon-btn.edit-btn:hover {
+      background: #4f46e5;
+      color: white;
+      transform: scale(1.02);
+    }
+    .icon-btn.del-btn:hover {
+      background: #be123c;
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 3rem 2rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 2rem;
+      backdrop-filter: blur(4px);
+      font-size: 1.05rem;
+      color: #a5b4fc;
+      border: 1px dashed #5b6e9e;
+      animation: fadeGlow 2s infinite alternate;
+    }
+    @keyframes fadeGlow {
+      0% { opacity: 0.7; border-color: #4b556b; }
+      100% { opacity: 1; border-color: #8b5cf6; }
+    }
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    /* responsive */
+    @media (max-width: 680px) {
+      .container {
+        padding: 0 0.5rem;
+      }
+      .form-card {
+        padding: 1.2rem;
+      }
+      .app-header h1 {
+        font-size: 2.1rem;
+      }
+    }
+
+    /* loading spinner inline */
+    .loader {
+      text-align: center;
+      padding: 2rem;
+      color: #c7d2fe;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="app-header">
+    <h1>✧ FlowNotes ✧</h1>
+    <div class="sub">write. save. access</div>
+  </div>
+
+  <div class="form-card">
+    <div class="form">
+      <input type="text" id="noteTitleInput" placeholder="Title · e.g., project idea" autocomplete="off" />
+      <textarea id="noteContentInput" placeholder="Write something elegant..."></textarea>
+      <button class="btn-primary" id="saveNoteBtn">✨ Save Note</button>
+    </div>
+  </div>
+
+  <div id="notesContainer" class="notes-grid">
+    <!-- dynamic notes injected here -->
+    <div class="loader">loading notes…</div>
+  </div>
+  <footer>✦ smooth gestures • auto-save ready • double-click edit ✦</footer>
+</div>
+
+<script>
+  // ---------- CONFIG ----------
+  const API_URL = "https://node-backends.onrender.com";
+
+  // DOM elements
+  const notesGrid = document.getElementById("notesContainer");
+  const titleInput = document.getElementById("noteTitleInput");
+  const contentInput = document.getElementById("noteContentInput");
+  const saveBtn = document.getElementById("saveNoteBtn");
+
+  // Helper: show loading / empty state
+  function setLoading(isLoading) {
+    if (isLoading && notesGrid.children.length === 0) {
+      notesGrid.innerHTML = `<div class="loader"><span>📒 syncing notes ...</span></div>`;
+    }
+  }
+
+  // ---------- GET NOTES with smooth rendering + sliding ----------
+  async function getNotes() {
+    try {
+      setLoading(true);
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const notes = await response.json();
+
+      if (!notes.length) {
+        notesGrid.innerHTML = `<div class="empty-state">🌸 no notes yet — write your first thought above 🌸</div>`;
+        return;
+      }
+
+      // build fragment for performance + smooth appearance
+      const fragment = document.createDocumentFragment();
+      notes.forEach((note, idx) => {
+        const noteDiv = document.createElement("div");
+        noteDiv.className = "note-card";
+        // tiny delay for staggered entrance? pure CSS handles it, but we add data-id
+        noteDiv.setAttribute("data-id", note._id);
+        // title sanitization (basic)
+        const safeTitle = escapeHtml(note.title) || "Untitled";
+        const safeContent = escapeHtml(note.content) || "no additional text";
+        
+        noteDiv.innerHTML = `
+          <div class="note-title">${safeTitle}</div>
+          <div class="note-content-preview">${safeContent}</div>
+          <div class="note-actions">
+            <button class="icon-btn edit-btn" data-id="${note._id}" data-title="${safeTitle.replace(/"/g, '&quot;')}" data-content="${safeContent.replace(/"/g, '&quot;')}">✎ Edit</button>
+            <button class="icon-btn del-btn" data-id="${note._id}">🗑 Delete</button>
+          </div>
+        `;
+        fragment.appendChild(noteDiv);
+      });
+      
+      notesGrid.innerHTML = "";
+      notesGrid.appendChild(fragment);
+      
+      // attach event listeners dynamically (delegation also works, but direct for clarity)
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.removeEventListener('click', handleEditClick);
+        btn.addEventListener('click', handleEditClick);
+      });
+      document.querySelectorAll('.del-btn').forEach(btn => {
+        btn.removeEventListener('click', handleDeleteClick);
+        btn.addEventListener('click', handleDeleteClick);
+      });
+    } catch (error) {
+      console.error("GET notes error:", error);
+      notesGrid.innerHTML = `<div class="empty-state" style="background:rgba(0,0,0,0.5)">⚠️ server connection issue — is backend running? ⚠️</div>`;
+    }
+  }
+
+  // helper for XSS safety
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+
+  // Edit handler (with smooth prompt? but we prefer inline elegant modal? we use modern prompt fallback but with nicer style: custom mini modal? using window.prompt but styled with improved approach)
+  // Actually to keep professional but smooth: I'm going to implement a modal-style inline editing (using window.prompt with better defaults? But users expect simple)
+  // To deliver best experience, I'll add a lightweight 'inline edit' using a floating window? For internship level, but still pleasant: I use modern dialog: actually we will use swal? No, keep lightweight.
+  // Instead I use an elegant approach: double-click to edit? already edit button triggers a custom dialog? I'll make edit open a subtle modal-like prompt replacement but using browser default but with pre-filled text.
+  // However we also need to support updating title/content: I'll reuse the add logic but separate update endpoint.
+  async function handleEditClick(e) {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const noteId = btn.getAttribute("data-id");
+    const currentTitle = btn.getAttribute("data-title") || "";
+    const currentContent = btn.getAttribute("data-content") || "";
+    
+    // Use a clean dialog-like experience: straightforward modern prompt default but we can use a small modal? but to not overcomplicate but smooth: we'll use window.prompt but better focus
+    // but we can use custom semi-transparent? But for simplicity and elegant feel, I'll build a small "inline edit flyout"? no — use beautiful window.prompt with default style is fine.
+    // But many users dislike prompt, but for sake of professionalism and speed, I will invoke a non-blocking 'dialog' using a simple modern technique: create a temporary div?
+    // Actually we will create a minimal dynamic modal (clean & pastel) to keep high quality. Let's build a quick inline modal for smooth editing.
+    showInlineEditModal(noteId, currentTitle, currentContent);
+  }
+
+  // create smooth centered modal for editing (professional)
+  function showInlineEditModal(noteId, oldTitle, oldContent) {
+    // remove any existing overlay
+    const existingOverlay = document.querySelector('.custom-edit-overlay');
+    if(existingOverlay) existingOverlay.remove();
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-edit-overlay';
+    overlay.style.cssText = `
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(10, 12, 25, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000;
+      animation: fadeInModal 0.2s ease;
+    `;
+    const modalCard = document.createElement('div');
+    modalCard.style.cssText = `
+      background: #21263f;
+      border-radius: 2rem;
+      max-width: 460px;
+      width: 90%;
+      padding: 1.8rem;
+      box-shadow: 0 30px 40px rgba(0,0,0,0.5);
+      border: 1px solid #6d7fcc;
+      animation: slideUpModal 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    `;
+    modalCard.innerHTML = `
+      <h3 style="margin:0 0 0.8rem 0; font-weight:600; background: linear-gradient(120deg,#c084fc,#a78bfa); background-clip:text; -webkit-background-clip:text; color:transparent;">✎ refine note</h3>
+      <input id="editTitleField" type="text" placeholder="Title" value="${escapeHtml(oldTitle).replace(/"/g, '&quot;')}" style="width:100%; background:#2d3250; border:1px solid #4f5b85; border-radius:1.8rem; padding:0.8rem 1rem; margin-bottom:1rem; color:white; font-size:1rem;" />
+      <textarea id="editContentField" placeholder="Content" style="width:100%; background:#2d3250; border:1px solid #4f5b85; border-radius:1.8rem; padding:0.8rem 1rem; color:white; font-family:inherit; min-height:120px; resize:vertical;">${escapeHtml(oldContent)}</textarea>
+      <div style="display:flex; gap:12px; margin-top:1.5rem; justify-content:flex-end;">
+        <button id="cancelEditBtn" style="background:#353b58; border:none; border-radius:2rem; padding:0.5rem 1.2rem; color:#ddd; cursor:pointer;">cancel</button>
+        <button id="confirmEditBtn" style="background:#7c3aed; border:none; border-radius:2rem; padding:0.5rem 1.5rem; color:white; font-weight:600; cursor:pointer;">update note</button>
+      </div>
+    `;
+    overlay.appendChild(modalCard);
+    document.body.appendChild(overlay);
+    
+    const titleField = modalCard.querySelector('#editTitleField');
+    const contentField = modalCard.querySelector('#editContentField');
+    const confirmBtn = modalCard.querySelector('#confirmEditBtn');
+    const cancelBtn = modalCard.querySelector('#cancelEditBtn');
+    
+    const closeModal = () => overlay.remove();
+    cancelBtn.onclick = closeModal;
+    confirmBtn.onclick = async () => {
+      const newTitle = titleField.value.trim() === "" ? "untitled" : titleField.value;
+      const newContent = contentField.value;
+      if (!newContent.trim()) {
+        // optional minor validation: but allow empty content but fine.
+      }
+      await updateNoteRequest(noteId, newTitle, newContent);
+      closeModal();
+    };
+    // close on backdrop click ?
+    overlay.addEventListener('click', (e) => {
+      if(e.target === overlay) closeModal();
+    });
+    // add key animation
+    const styleAnimate = document.createElement('style');
+    if(!document.querySelector('#modalAnimStyle')) {
+      styleAnimate.id = 'modalAnimStyle';
+      styleAnimate.innerText = `
+        @keyframes fadeInModal { from { opacity:0; } to { opacity:1; } }
+        @keyframes slideUpModal { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
+      `;
+      document.head.appendChild(styleAnimate);
+    }
+    titleField.focus();
+  }
+
+  async function updateNoteRequest(id, title, content) {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content })
+      });
+      if (!response.ok) throw new Error("update failed");
+      await getNotes(); // refresh with animation
+      // optional scroll feedback
+      const updatedCard = document.querySelector(`.note-card[data-id="${id}"]`);
+      if(updatedCard) {
+        updatedCard.style.transition = "0.2s";
+        updatedCard.style.transform = "scale(1.01)";
+        setTimeout(() => { if(updatedCard) updatedCard.style.transform = ""; }, 200);
+      }
+    } catch(err) {
+      console.error("Update error", err);
+      alert("⚠️ could not update note. check connection");
+    }
+  }
+
+  // DELETE handler with subtle animation and removal
+  async function handleDeleteClick(e) {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const noteId = btn.getAttribute("data-id");
+    // nice confirmation before delete
+    const confirmDelete = confirm("delete this note? it will vanish ✨");
+    if (!confirmDelete) return;
+    
+    try {
+      const response = await fetch(`${API_URL}/${noteId}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("delete failed");
+      // find card and add exit animation
+      const cardElement = btn.closest('.note-card');
+      if (cardElement) {
+        cardElement.style.transform = "scale(0.92)";
+        cardElement.style.opacity = "0";
+        cardElement.style.transition = "all 0.2s ease";
+        await new Promise(r => setTimeout(r, 150));
+      }
+      await getNotes();
+    } catch (err) {
+      console.error("DELETE error", err);
+      alert("could not delete note (backend error)");
+    }
+  }
+
+  // ---------- ADD NOTE with smooth reset + floating feedback ----------
+  async function addNote() {
+    const title = titleInput.value.trim() === "" ? "✧ thought" : titleInput.value;
+    const content = contentInput.value;
+    if (!content.trim()) {
+      // subtle gentle warning without breaking style
+      const warnMsg = document.createElement('div');
+      warnMsg.textContent = "📝 content cannot be empty";
+      warnMsg.style.cssText = "background:#c2410c; color:white; border-radius:2rem; padding:6px 14px; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:1100; font-size:0.8rem; backdrop-filter:blur(8px);";
+      document.body.appendChild(warnMsg);
+      setTimeout(() => warnMsg.remove(), 1800);
+      return;
+    }
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content })
+      });
+      if (!response.ok) throw new Error("add failed");
+      // clear inputs
+      titleInput.value = "";
+      contentInput.value = "";
+      await getNotes();
+      // smooth auto-scroll to top of notes grid to see new note appear
+      const container = document.querySelector(".notes-grid");
+      if(container) {
+        container.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      // small success feedback
+      const toast = document.createElement('div');
+      toast.innerText = "✓ note added";
+      toast.style.cssText = "position:fixed; bottom:25px; right:25px; background:#2e3a48; backdrop-filter:blur(12px); padding:8px 20px; border-radius:40px; color:#c084fc; font-weight:500; z-index:1000; border-left:3px solid #a78bfa; box-shadow:0 4px 12px rgba(0,0,0,0.3);";
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 1500);
+    } catch (error) {
+      console.error("Add note error", error);
+      alert("backend not reachable, check if server is running on port 5000");
+    }
+  }
+
+  // set up save button + initial load
+  saveBtn.addEventListener("click", addNote);
+  
+  // optional: ctrl+enter quick add
+  const contentArea = document.getElementById("noteContentInput");
+  contentArea.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      addNote();
+    }
+  });
+  
+  // initial fetch
+  getNotes();
+</script>
+</body>
+</html>
