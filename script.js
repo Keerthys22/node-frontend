@@ -1,4 +1,4 @@
-const API_URL = "https://node-backends.onrender.com";
+const API_URL = "https://node-backends.onrender.com/api/notes";
 
 // GET NOTES
 async function getNotes() {
